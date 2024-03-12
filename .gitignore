@@ -12,7 +12,6 @@ __pycache__/
 
 # Dependency Management Files:
 pip-lock.txt
-requirements.txt
 *.egg-info/
 
 # IDE or Editor Specific Files:
