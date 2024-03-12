@@ -12,7 +12,8 @@ class Group(db.Model, SerializerMixin):
     visibility_status = db.Column(db.String, nullable=False)
 
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-
+    goals = db.relationship("Goal", cascade="all, delete", backref="group")
+    
     def __repr__(self):
         return f"Group(id={self.id}, " + \
             f"is_family={self.is_family}, " + \
