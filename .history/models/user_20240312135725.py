@@ -14,7 +14,6 @@ class User(db.Model, SerializerMixin):
     _password_hash = db.Column(db.String, nullable=False)
 
     groups = db.relationship("Group", backref="user")
-    accounts =db.relationship("Account", backref="user")
 
     @hybrid_property
     def password_hash(self):
