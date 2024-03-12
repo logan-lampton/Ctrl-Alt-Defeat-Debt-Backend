@@ -8,10 +8,12 @@ class User(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
 
     username = db.Column(db.String, unique=True, nullable=False)
-    email = db.Column(db.String, primary_key=True)
-    phone= db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String, unique=True, nullable=False)
+    phone = db.Column(db.Integer, unique=True, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     _password_hash = db.Column(db.String, nullable=False)
+
+    groups = db.relationship("Group", backref="user")
 
     @hybrid_property
     def password_hash(self):
@@ -32,4 +34,4 @@ class User(db.Model, SerializerMixin):
             f"username={self.username}, " + \
             f"email={self.email}, " + \
             f"phone={self.phone}, " + \
-            f"phone={self.created_at})"
+            f"created_at={self.created_at})"
