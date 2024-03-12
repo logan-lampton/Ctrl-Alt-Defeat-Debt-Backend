@@ -1,6 +1,6 @@
 
 # Virtual Environment:
-venv/
+.venv/
 env/
 virtualenv/
 pipenv/
