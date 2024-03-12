@@ -1,0 +1,55 @@
+#For Virtual Environment
+
+# Virtual Environment:
+venv/
+env/
+virtualenv/
+pipenv/
+
+# Compiled Python Files:
+*.pyc
+*.pyo
+__pycache__/
+
+# Dependency Management Files:
+pip-lock.txt
+*.egg-info/
+
+# IDE or Editor Specific Files:
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.pyc
+
+# Logs and Temporary Files:
+*.log
+*.swp
+*.swo
+.DS_Store
+
+# Configuration Files:
+.env
+config.ini
+settings.ini
+
+# Generated Files:
+*.csv (if generated)
+*.db (if generated)
+
+# Runtime Files:
+*.pyc
+*.pyo
+*.lock
+*.sqlite
+
+# Sensitive or Environment-Specific Files:
+*.env
+*.secret
+.envrc
+.env.*
+.secret.*
+
+# Temporary Files and Directories:
+*.tmp
+.tmp/

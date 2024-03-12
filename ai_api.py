@@ -21,6 +21,7 @@ client = OpenAI()
 
 response = client.chat.completions.create(
     model="gpt-3.5-turbo",
+    response_format={ "type": "json_object" },
     messages=[
         {
             "role": "system",
@@ -32,7 +33,7 @@ response = client.chat.completions.create(
         }
     ],
     temperature=0.5,
-    max_tokens=64,
+    max_tokens=50,
 )
 
 print(response.choices[0].message)
