@@ -18,8 +18,8 @@ class Goal(db.Model, SerializerMixin):
         return f"Goal(id={self.id}, " + \
             f"name={self.name}, " + \
             f"saving_target={self.saving_target}, " + \
-            f"start_timeframe={self.start_time}, " + \
-            f"end_timeframe={self.end_time}, " + \
+            f"start_timeframe={self.start_timeframe}, " + \
+            f"end_timeframe={self.end_timeframe}, " + \
             f"emoji={self.emoji}, " + \
             f"group_id={self.group_id})" 
     
