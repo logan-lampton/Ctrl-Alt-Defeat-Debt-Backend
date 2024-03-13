@@ -14,6 +14,8 @@ import os
 import plaid
 from plaid.api import plaid_api
 
+app = Flask(__name__)
+
 client_id = os.getenv('PLAID_CLIENT_ID')
 secret_id = os.getenv('PLAID_SECRET')
 
