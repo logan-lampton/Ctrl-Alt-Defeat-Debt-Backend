@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from config import app
 from models.models import *
+from routes.routes import *
 from integration.plaid_integration import *
         
 # docker build -t python-server .
