@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, Blueprint, request, jsonify
 from plaid.api import plaid_api
 from plaid.model.country_code import CountryCode
 from plaid.model.products import Products
@@ -14,7 +14,6 @@ import os
 import plaid
 from plaid.api import plaid_api
 
-app = Flask(__name__)
 
 client_id = os.getenv('PLAID_CLIENT_ID')
 secret_id = os.getenv('PLAID_SECRET')
@@ -30,7 +29,9 @@ configuration = plaid.Configuration(
 api_client = plaid.ApiClient(configuration)
 client = plaid_api.PlaidApi(api_client)
 
-@app.route('/create_link_token', methods=['POST'])
+plaid_bp = Blueprint('plaid_bp', __name__)
+
+@plaid_bp.route('/create_link_token', methods=['POST'])
 def create_link_token():
     try:
         request = LinkTokenCreateRequest(
@@ -45,7 +46,7 @@ def create_link_token():
     except plaid.ApiException as e:
         return jsonify({'error': e.body})
 
-@app.route('/exchange_public_token', methods=['POST'])
+@plaid_bp.route('/exchange_public_token', methods=['POST'])
 def exchange_public_token():
     data = request.get_json()
     public_token = data.get('public_token')
@@ -64,7 +65,7 @@ def exchange_public_token():
     except plaid.ApiException as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/get_transactions', methods=['POST'])
+@plaid_bp.route('/get_transactions', methods=['POST'])
 def get_transactions():
     data = request.get_json()
     if not data or 'access_token' not in data:
