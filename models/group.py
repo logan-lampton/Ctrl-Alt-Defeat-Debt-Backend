@@ -4,6 +4,8 @@ from sqlalchemy_serializer import SerializerMixin
 class Group(db.Model, SerializerMixin):
     __tablename__ = "groups"
 
+    serialize_rules = ('-goals.group', '-user')
+
     id = db.Column(db.Integer, primary_key=True)
 
     is_family = db.Column(db.Boolean, nullable=False)

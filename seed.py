@@ -18,12 +18,14 @@ if __name__ == "__main__":
         #Creates fake users
         users = []
         print("    Seeding Users...")
+        email_endpoints = ["@gmail.com", "@yahoo.com", "@outlook.com"]
         for i in range(10):
+            email_endpoint = rc(email_endpoints)
             fake_user = fake.unique.first_name()
             fake_number = fake.msisdn()
             user = User(
                 username = fake_user,
-                email = f"{fake_user}@gmail.com",
+                email = f"{fake_user}{email_endpoint}",
                 phone = fake_number
             )
             user.password_hash = user.username
