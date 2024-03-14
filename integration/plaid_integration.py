@@ -7,6 +7,7 @@ from plaid.model.link_token_create_request_user import LinkTokenCreateRequestUse
 from plaid.model.item_public_token_exchange_request import ItemPublicTokenExchangeRequest
 from plaid.model.transactions_get_request import TransactionsGetRequest
 from plaid.model.transactions_get_request_options import TransactionsGetRequestOptions
+from plaid.model.accounts_get_request import AccountsGetRequest
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import os
@@ -88,3 +89,21 @@ def get_transactions():
         return jsonify(response.to_dict())
     except plaid.ApiException as e:
         return jsonify({'error': str(e)})
+@plaid_bp.route('/get_accounts', methods=['POST'])
+def get_accounts():
+    data = request.get_json()
+    if not data or 'access_token' not in data:
+        return jsonify({'error': 'Missing access_token'}), 400
+
+    access_token = data['access_token']
+
+    try:
+        accounts_request = AccountsGetRequest(
+            access_token=access_token
+        )
+        
+        accounts_response = client.accounts_get(accounts_request)
+        # Directly return the response from Plaid's API to the frontend
+        return jsonify(accounts_response.to_dict())
+    except plaid.ApiException as e:
+        return jsonify({'error': str(e)}), 500
