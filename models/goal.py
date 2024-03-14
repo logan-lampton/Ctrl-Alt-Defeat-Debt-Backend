@@ -3,6 +3,8 @@ from sqlalchemy_serializer import SerializerMixin
 
 class Goal(db.Model, SerializerMixin):
     __tablename__ = 'goals'
+
+    serialize_rules = ('-group', '-user')
     
     id = db.Column(db.Integer, primary_key=True)
     

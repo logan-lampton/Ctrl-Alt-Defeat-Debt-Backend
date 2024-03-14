@@ -3,6 +3,8 @@ from sqlalchemy_serializer import SerializerMixin
 
 class Account(db.Model, SerializerMixin):
     __tablename__ = "accounts"
+
+    serialize_rules = ('-user')
     
     id = db.Column(db.Integer, primary_key=True)
 

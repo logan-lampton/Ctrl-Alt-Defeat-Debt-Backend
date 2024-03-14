@@ -5,13 +5,16 @@ from sqlalchemy.ext.hybrid import hybrid_property
 class User(db.Model, SerializerMixin):
     __tablename__ = "users"
 
+    serialize_rules = ('-groups.goals', '-groups.user', '-accounts.user', '-user.accounts', '-user.groups')
+
     id = db.Column(db.Integer, primary_key=True)
 
-    username = db.Column(db.String, unique=True, nullable=False)
     email = db.Column(db.String, unique=True, nullable=False)
     phone = db.Column(db.String, unique=True, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     _password_hash = db.Column(db.String, nullable=False)
+    _access_token = db.Column(db.String)
+    _totp_secret = db.Column(db.String)
 
     groups = db.relationship("Group", backref="user")
     accounts = db.relationship("Account", backref="user")
@@ -32,7 +35,6 @@ class User(db.Model, SerializerMixin):
     
     def __repr__(self):
         return f"User(id={self.id}, " + \
-            f"username={self.username}, " + \
             f"email={self.email}, " + \
             f"phone={self.phone}, " + \
             f"created_at={self.created_at})"
