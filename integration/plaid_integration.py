@@ -89,6 +89,7 @@ def get_transactions():
         return jsonify(response.to_dict())
     except plaid.ApiException as e:
         return jsonify({'error': str(e)})
+        
 @plaid_bp.route('/get_accounts', methods=['POST'])
 def get_accounts():
     data = request.get_json()
