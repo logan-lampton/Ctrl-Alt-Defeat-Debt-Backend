@@ -9,15 +9,23 @@ class User(db.Model, SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
 
+    first_name = db.Column(db.String, unique=True, nullable=False)
+    last_name = db.Column(db.String, unique=True, nullable=False)
     email = db.Column(db.String, unique=True, nullable=False)
     phone = db.Column(db.String, unique=True, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
+    admin = db.Column(db.Boolean, default=False, nullable=False)
+    role = db.Column(db.String, nullable=False)
+    visibility_status = db.Column(db.String, nullable=False)
+    rent = db.Column(db.Float, nullable=False)
+    income = db.Column(db.Float, nullable=False)
+
     _password_hash = db.Column(db.String, nullable=False)
     _access_token = db.Column(db.String)
     _totp_secret = db.Column(db.String)
 
-    groups = db.relationship("Group", backref="user")
-    accounts = db.relationship("Account", backref="user")
+    group_id = db.Column(db.Integer, db.ForeignKey("groups.id"), nullable=False)
+    accounts = db.relationship("Account", cascade="all, delete", backref="user")
 
     @hybrid_property
     def password_hash(self):
@@ -36,5 +44,14 @@ class User(db.Model, SerializerMixin):
     def __repr__(self):
         return f"User(id={self.id}, " + \
             f"email={self.email}, " + \
+            f"first_name={self.first_name}, " + \
+            f"last_name={self.last_name}, " + \
             f"phone={self.phone}, " + \
-            f"created_at={self.created_at})"
+            f"created_at={self.created_at}, " + \
+            f"admin={self.admin}, " + \
+            f"role={self.role}, " + \
+            f"visibility_status={self.visibility_status}, " + \
+            f"rent={self.rent}, " + \
+            f"group_id={self.group_id}, " + \
+            f"accounts={self.accounts}, " + \
+            f"income={self.income})"
