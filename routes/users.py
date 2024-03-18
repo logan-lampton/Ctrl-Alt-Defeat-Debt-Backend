@@ -2,7 +2,7 @@ from flask_restful import Resource
 from flask import request, session
 from sqlalchemy.exc import IntegrityError 
 
-from models.models import User
+from models.models import User, Goal, Group
 from config import api, db
 
 class CheckSession(Resource):
@@ -43,9 +43,24 @@ class Login(Resource):
 class Signup(Resource):
     
     def post(self):
+        group = Group(
+            is_family=request.get_json()["first_name"],
+            name=request.get_json()["first_name"],
+        )
+        db.session.add(group)
+        db.session.commit()
+
         user = User(
+            first_name=request.get_json()["first_name"],
+            last_name=request.get_json()["last_name"],
             email=request.get_json()["email"],
             phone=request.get_json()["phone"],
+            admin=request.get_json()["admin"],
+            role=request.get_json()["role"],
+            visibility_status=request.get_json()["visibility_status"],
+            rent=request.get_json()["rent"],
+            income=request.get_json()["income"],
+            group_id=request.get_json()["group_id"],
         )
         user.password_hash = request.get_json()["password"]
         try:
