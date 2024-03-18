@@ -12,7 +12,6 @@ if __name__ == "__main__":
         print("Deleting the database...")
         # deletes database
         User.query.delete()
-        Account.query.delete()
         Group.query.delete()
         Goal.query.delete()
 
@@ -130,24 +129,24 @@ if __name__ == "__main__":
             goals.append(goal)
 
         #Creates fake accounts
-        accounts = []
-        print("    Seeding Accounts...")
-        acc_types = ["Savings", "Checking"]
-        for user in users:
-            types = rc(acc_types)
-            acc_bal = 0
-            if user.admin == True:
-                acc_bal = randint(400, 1500)
+        # accounts = []
+        # print("    Seeding Accounts...")
+        # acc_types = ["Savings", "Checking"]
+        # for user in users:
+        #     types = rc(acc_types)
+        #     acc_bal = 0
+        #     if user.admin == True:
+        #         acc_bal = randint(400, 1500)
 
-            account = Account(
-                name = fake.unique.company(),
-                type = types,
-                balance = acc_bal,
-                user_id = user.id,
-            )
+        #     account = Account(
+        #         name = fake.unique.company(),
+        #         type = types,
+        #         balance = acc_bal,
+        #         user_id = user.id,
+        #     )
 
-            db.session.add(account)
-            db.session.commit()
-            groups.append(group)
+        #     db.session.add(account)
+        #     db.session.commit()
+        #     groups.append(group)
 
         print("Seed complete!")

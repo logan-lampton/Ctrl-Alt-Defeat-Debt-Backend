@@ -5,7 +5,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 class User(db.Model, SerializerMixin):
     __tablename__ = "users"
 
-    serialize_rules = ('-groups.goals', '-groups.user', '-accounts.user', '-user.accounts', '-user.groups')
+    serialize_rules = ('-group', '-goal')
 
     id = db.Column(db.Integer, primary_key=True)
 
@@ -14,18 +14,17 @@ class User(db.Model, SerializerMixin):
     email = db.Column(db.String, unique=True, nullable=False)
     phone = db.Column(db.String, unique=True, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
-    admin = db.Column(db.Boolean, default=False, nullable=False)
+    admin = db.Column(db.Boolean, default=True, nullable=False)
     role = db.Column(db.String, nullable=False)
     visibility_status = db.Column(db.String, nullable=False)
     rent = db.Column(db.Float, nullable=False)
-    income = db.Column(db.Float, nullable=False)
+    income = db.Column(db.Float, default=0, nullable=False)
 
     _password_hash = db.Column(db.String, nullable=False)
     _access_token = db.Column(db.String)
     _totp_secret = db.Column(db.String)
 
     group_id = db.Column(db.Integer, db.ForeignKey("groups.id"), nullable=False)
-    accounts = db.relationship("Account", cascade="all, delete", backref="user")
 
     @hybrid_property
     def password_hash(self):
@@ -53,5 +52,4 @@ class User(db.Model, SerializerMixin):
             f"visibility_status={self.visibility_status}, " + \
             f"rent={self.rent}, " + \
             f"group_id={self.group_id}, " + \
-            f"accounts={self.accounts}, " + \
             f"income={self.income})"
