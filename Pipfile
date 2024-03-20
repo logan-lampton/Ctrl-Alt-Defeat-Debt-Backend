@@ -15,6 +15,7 @@ python-dotenv = "==1.0.1"
 openai = "==1.13.3"
 plaid-python = "==19.0.0"
 faker = "==15.3.2"
+pyotp = "==2.9.0"
 
 [dev-packages]
 
