@@ -24,7 +24,7 @@ class User(db.Model, SerializerMixin):
     _access_token = db.Column(db.String)
     _totp_secret = db.Column(db.String)
 
-    group_id = db.Column(db.Integer, db.ForeignKey("groups.id"), nullable=False)
+    group_id = db.Column(db.Integer, db.ForeignKey("groups.id"))
 
     @hybrid_property
     def password_hash(self):

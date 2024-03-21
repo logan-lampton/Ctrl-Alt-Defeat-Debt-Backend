@@ -10,6 +10,7 @@ class Group(db.Model, SerializerMixin):
 
     is_family = db.Column(db.Boolean, nullable=False)
     name = db.Column(db.String, nullable=False)
+    _access_token = db.Column(db.String)
 
     users = db.relationship("User", cascade="all, delete", backref="group")
     goals = db.relationship("Goal", cascade="all, delete", backref="group")
@@ -18,5 +19,6 @@ class Group(db.Model, SerializerMixin):
         return f"Group(id={self.id}, " + \
             f"is_family={self.is_family}, " + \
             f"name={self.name}, " + \
+            f"name={self._access_token}, " + \
             f"users={self.users}, " + \
             f"goals={self.goals})"
