@@ -1,6 +1,6 @@
-from flask import Flask, Blueprint, request, jsonify
-from models.models import *
-from config import db, api
+from flask import Flask, Blueprint, request, jsonify, session
+from models.models import User, Group, Goal, Personal_goal 
+from config import api, db
 from datetime import datetime, timedelta
 
 from plaid.api import plaid_api
@@ -11,6 +11,11 @@ from dotenv import load_dotenv
 import os
 import json
 import requests
+
+# from users import users  # Import the users blueprint
+
+# # Register the users blueprint
+# app.register_blueprint(users)
 
 # Load the .env file. If it's in the same directory as your script, you can call load_dotenv() without any arguments.
 load_dotenv()
@@ -36,18 +41,14 @@ plaid_client = plaid_api.PlaidApi(api_client)
 
 system_prompt = "You are a helpful, financial analyst AI assistant that specializes in personal finance designed to output in valid JSON. You can analyze a user's financial data efficiently and accurately, including bank information, and transactions, to provide budget recommendations based on given information. When providing recommended action items, make sure to use transactions to give a more personalized and feasible response. You can also make future projections based on this data. If a user has a specific financial goal, you can suggest strategies to help them save money and reach their goal. You can accurately calculate sums, amounts, and budget predictions based off of data given to you."
 
-savings_example_json = "{'savings_monthly': amount of suggested monthly savings per month from today's date to the end date for the goal and based off income, savings goal, transactions, and income, 'savings_needed': number for savings needed to reach goal based off goal and current savings_balance, 'strategy': suggestions in a string for a strategy on how to reach goal from the information given, 'actions': recommended personalized, feasible actions that can be taken from the given information and from suggestions in a few strings within an array}"
+savings_example_json = "{'savings_monthly': amount of suggested monthly savings per month from today's date to the end date for the goal and based off income, savings goal, transactions, and income, 'savings_needed': amount of savings needed to reach goal based off goal and current savings_balance, 'strategy': suggestions in a string for a strategy on how to reach goal from the information given, 'actions': recommended personalized, feasible actions that can be taken from the given information and from suggestions in a few strings within an array. If string mentions a specific category to save in, include total amount spent in that category based on previous month spending}"
 
 insights_system_prompt = "You are a financial analyst AI assistant specialized in personal finance designed to output in valid JSON. You can efficiently and accurately analyze a user's financial data, including bank transactions, categories of each transaction, and the amount spent in each transaction. Based on this data, you can provide predictions of a user's future total spending in each category for the following month. Your recommendations should be tailored and accurate, ensuring the user can make informed financial decisions."
 
+insights_assistant = "{'projections': {'each category is a key, create as many as needed. if a category does not have a projected amount for the following month or there is not enough data to make a predictions, do not include it': 'the total amount spent in that specific category within the past month'}}"
+
 
 def get_plaid_transactions(access_token):
-    
-    # user_id = session.get("user_id")
-    # if not user_id:
-    #     return {'error': 'User not authorized.'}, 401
-    # else:
-    #     user = User.query.filter(User.id == user_id).first()
         
     # Setup the dates for fetching transactions
     start_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
@@ -70,6 +71,18 @@ open_ai = Blueprint('open_ai', __name__)
 
 @open_ai.route('/response', methods=['POST'])
 def ai_response():
+    
+    user_id = session.get("user_id")
+    print(f"Retrieved user_id from session: {user_id}")
+    
+    if not user_id:
+        return {'error': 'User not authorized.'}, 401
+    # else:
+    #     user = User.query.filter(User.id == user_id).first()
+    #     print(user)
+    #     return {'error': 'User not found.'}, 404
+    
+    
     plaid_data = request.get_json()
     if not plaid_data or 'access_token' not in plaid_data:
         return jsonify({'error': 'Missing access_token'}), 400
@@ -83,7 +96,7 @@ def ai_response():
 
         # Construct the goals request payload
         goals_payload = {
-            "model": "gpt-3.5-turbo",
+            "model": "gpt-4-0125-preview",
             "response_format": {"type": "json_object"},
             "messages":  [
                 {"role": "system", "content": system_prompt}, 
@@ -95,11 +108,12 @@ def ai_response():
         
         # Construct the predictions request payload
         predictions_payload = {
-            "model": "gpt-3.5-turbo",
+            "model": "gpt-4-0125-preview",
             "response_format": {"type": "json_object"},
             "messages":  [
                 {"role": "system", "content": insights_system_prompt}, 
-                {"role": "user", "content": f"{transactions_data}"}
+                {"role": "user", "content": f"{transactions_data}"},
+                {"role": "assistant", "content": insights_assistant}
             ],
             "temperature":  0.2
         }
