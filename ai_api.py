@@ -96,7 +96,7 @@ def ai_response():
 
         # Construct the goals request payload
         goals_payload = {
-            "model": "gpt-3.5",
+            "model": "gpt-3.5-turbo",
             "response_format": {"type": "json_object"},
             "messages":  [
                 {"role": "system", "content": system_prompt}, 
