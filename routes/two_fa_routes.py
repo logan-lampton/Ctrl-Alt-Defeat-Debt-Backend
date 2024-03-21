@@ -1,38 +1,46 @@
 from flask import Blueprint, request, jsonify
-import pyotp
-from models.models import User 
-from config import api, db
+from twilio.rest import Client
+import os
+from dotenv import load_dotenv
 
+# Load environment variables
+load_dotenv()
+
+# Initialize Twilio client with environment variables
+twilio_client = Client(os.getenv('TWILIO_ACCOUNT_SID'), os.getenv('TWILIO_AUTH_TOKEN'))
+verification_service_sid = os.getenv('TWILIO_VERIFICATION_SERVICE_SID')
 
 two_fa_blueprint = Blueprint('two_fa', __name__)
 
-@two_fa_blueprint.route('/enable-2fa', methods=['GET'])
+@two_fa_blueprint.route('/enable-2fa', methods=['POST'])
 def enable_2fa():
-    user_id = request.args.get('user_id')
-    user = User.query.get(user_id)
-    if not user:
-        return jsonify({"error": "User not found"}), 404
-
-    user._totp_secret = pyotp.random_base32()
-
-    db.session.add(user)
-    db.session.commit()
-
-    totp = pyotp.TOTP(user._totp_secret)
-    uri = totp.provisioning_uri(name=user.email, issuer_name='Money Magnet')
-    return jsonify({"qr_code_uri": uri, 'totp_secret': user._totp_secret})
+    # Hardcoded phone number
+    phone_number = '+12124959732'
+    
+    try:
+        verification = twilio_client.verify.services(verification_service_sid) \
+            .verifications.create(to=phone_number, channel='sms')
+        return jsonify({"message": "Verification code sent via SMS to +12124959732."}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @two_fa_blueprint.route('/verify-otp', methods=['POST'])
 def verify_otp():
-    user_id = request.json.get('user_id')
-    otp = request.json.get('otp')
+    # Assuming the user_id or another form of identification is still part of the request to identify the user in your system
+    code = request.json.get('otp')
     
-    user = User.query.get(user_id)
-    if not user or not user._totp_secret:
-        return jsonify({"error": "Invalid user or 2FA not set up"}), 400
+    # Hardcoded phone number for verification
+    phone_number = '+12124959732'
+    
+    try:
+        verification_check = twilio_client.verify \
+            .services(verification_service_sid) \
+            .verification_checks \
+            .create(to=phone_number, code=code)
 
-    totp = pyotp.TOTP(user._totp_secret)
-    if totp.verify(otp):
-        return jsonify({"success": "OTP verified"}), 200
-    else:
-        return jsonify({"error": "Invalid OTP"}), 400
+        if verification_check.status == 'approved':
+            return jsonify({"message": "OTP verified successfully for +12124959732"}), 200
+        else:
+            return jsonify({"error": "Invalid OTP"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
