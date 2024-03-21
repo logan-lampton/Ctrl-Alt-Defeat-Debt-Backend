@@ -1,39 +1,142 @@
+from flask import Flask, Blueprint, request, jsonify
+from models.models import *
+from config import db, api
+from datetime import datetime, timedelta
+
+from plaid.api import plaid_api
+import plaid
+from plaid.api import plaid_api
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
+import json
+import requests
 
 # Load the .env file. If it's in the same directory as your script, you can call load_dotenv() without any arguments.
 load_dotenv()
 
-client = OpenAI()
-# defaults to getting the key using os.environ.get("OPENAI_API_KEY")
-# if you saved the key under a different environment variable name, you can do something like:
-# client = OpenAI(
-#   api_key=os.environ.get("CUSTOM_ENV_NAME"),
-# )
-
-# Now you can access the variable
-# openai_api_key = os.getenv('OPEN_AI_API_KEY')
-
-# Set the API key
-# openai.api_key = openai_api_key
-
-
-response = client.chat.completions.create(
-    model="gpt-3.5-turbo",
-    response_format={ "type": "json_object" },
-    messages=[
-        {
-            "role": "system",
-            "content": "You are a helpful AI assistant that specializes in personal finance. You can analyze a user's financial data, including bank information, expenses, and transactions, to provide budget recommendations. You can also make future projections based on this data. If a user has a specific financial goal, you can suggest strategies to help them save money and reach their goal."
-        },
-        {
-            "role": "user",
-            "content": "I'm trying to save for a new car. Can you help me adjust my budget?"
-        }
-    ],
-    temperature=0.5,
-    max_tokens=50,
+api_key = os.getenv("OPENAI_API_KEY")
+openai_client = OpenAI(
+    api_key=api_key
 )
 
-print(response.choices[0].message)
+client_id = os.getenv('PLAID_CLIENT_ID')
+secret_id = os.getenv('PLAID_SECRET')
+
+configuration = plaid.Configuration(
+    host=plaid.Environment.Sandbox,
+    api_key={
+        'clientId': client_id,
+        'secret': secret_id,
+    }
+)
+
+api_client = plaid.ApiClient(configuration)
+plaid_client = plaid_api.PlaidApi(api_client)
+
+system_prompt = "You are a helpful, financial analyst AI assistant that specializes in personal finance designed to output in valid JSON. You can analyze a user's financial data efficiently and accurately, including bank information, and transactions, to provide budget recommendations based on given information. When providing recommended action items, make sure to use transactions to give a more personalized and feasible response. You can also make future projections based on this data. If a user has a specific financial goal, you can suggest strategies to help them save money and reach their goal. You can accurately calculate sums, amounts, and budget predictions based off of data given to you."
+
+savings_example_json = "{'savings_monthly': amount of suggested monthly savings per month from today's date to the end date for the goal and based off income, savings goal, transactions, and income, 'savings_needed': number for savings needed to reach goal based off goal and current savings_balance, 'strategy': suggestions in a string for a strategy on how to reach goal from the information given, 'actions': recommended personalized, feasible actions that can be taken from the given information and from suggestions in a few strings within an array}"
+
+insights_system_prompt = "You are a financial analyst AI assistant specialized in personal finance designed to output in valid JSON. You can efficiently and accurately analyze a user's financial data, including bank transactions, categories of each transaction, and the amount spent in each transaction. Based on this data, you can provide predictions of a user's future total spending in each category for the following month. Your recommendations should be tailored and accurate, ensuring the user can make informed financial decisions."
+
+
+def get_plaid_transactions(access_token):
+    
+    # user_id = session.get("user_id")
+    # if not user_id:
+    #     return {'error': 'User not authorized.'}, 401
+    # else:
+    #     user = User.query.filter(User.id == user_id).first()
+        
+    # Setup the dates for fetching transactions
+    start_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+    end_date = datetime.now().strftime('%Y-%m-%d')
+
+    try:
+        transactions_request = {
+            'access_token': access_token,
+            'start_date': start_date,
+            'end_date': end_date,
+        }
+        
+        response = plaid_client.transactions_get(transactions_request)
+        return response
+    except plaid.ApiException as e:
+        return jsonify({'error': str(e)})
+    
+
+open_ai = Blueprint('open_ai', __name__)
+
+@open_ai.route('/response', methods=['POST'])
+def ai_response():
+    plaid_data = request.get_json()
+    if not plaid_data or 'access_token' not in plaid_data:
+        return jsonify({'error': 'Missing access_token'}), 400
+
+    access_token = plaid_data['access_token']
+    
+    try:
+        # Get the data from the request
+        transactions_response = get_plaid_transactions(access_token)
+        transactions_data = transactions_response.to_dict()
+
+        # Construct the goals request payload
+        goals_payload = {
+            "model": "gpt-3.5-turbo",
+            "response_format": {"type": "json_object"},
+            "messages":  [
+                {"role": "system", "content": system_prompt}, 
+                {"role": "user", "content": f"{transactions_data}"},
+                {"role": "assistant", "content": savings_example_json}
+            ],
+            "temperature":  0.2
+        }
+        
+        # Construct the predictions request payload
+        predictions_payload = {
+            "model": "gpt-3.5-turbo",
+            "response_format": {"type": "json_object"},
+            "messages":  [
+                {"role": "system", "content": insights_system_prompt}, 
+                {"role": "user", "content": f"{transactions_data}"}
+            ],
+            "temperature":  0.2
+        }
+
+        # Make the request to the OpenAI API
+        response_goals = requests.post(
+            "https://api.openai.com/v1/chat/completions",
+            json=goals_payload,
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {api_key}"
+            }
+        )
+
+        # Check if the goals request was successful
+        if response_goals.status_code != 200:
+            return jsonify({"error": f"OpenAI API request for goals failed with status code {response_goals.status_code}"}), response_goals.status_code
+
+        # Make the request to the OpenAI API for predictions
+        response_predictions = requests.post(
+            "https://api.openai.com/v1/chat/completions",
+            json=predictions_payload,
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {api_key}"
+            }
+        )
+
+        # Check if the predictions request was successful
+        if response_predictions.status_code != 200:
+            return jsonify({"error": f"OpenAI API request for predictions failed with status code {response_predictions.status_code}"}), response_predictions.status_code
+
+        # Return both responses
+        return {
+            "goals": response_goals.json(),
+            "predictions": response_predictions.json()
+        }
+
+    except Exception as e:
+        return jsonify({"error_loser": str(e)}), 500
