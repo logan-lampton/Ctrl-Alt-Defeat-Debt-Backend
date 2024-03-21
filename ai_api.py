@@ -1,5 +1,5 @@
 from flask import Flask, Blueprint, request, jsonify, session
-from models.models import User, Group, Goal, Personal_goal 
+from models.models import * #User, Group, Goal, Personal_goal 
 from config import api, db
 from datetime import datetime, timedelta
 
@@ -11,11 +11,6 @@ from dotenv import load_dotenv
 import os
 import json
 import requests
-
-# from users import users  # Import the users blueprint
-
-# # Register the users blueprint
-# app.register_blueprint(users)
 
 # Load the .env file. If it's in the same directory as your script, you can call load_dotenv() without any arguments.
 load_dotenv()
@@ -77,11 +72,16 @@ def ai_response():
     
     if not user_id:
         return {'error': 'User not authorized.'}, 401
-    # else:
-    #     user = User.query.filter(User.id == user_id).first()
-    #     print(user)
-    #     return {'error': 'User not found.'}, 404
+
+    user = User.query.filter(User.id == user_id).first()
+    user_personal_goal = user.personal_goals[0]
+    goal_object = {
+        "name": user_personal_goal.name,
+        "saving_target": user_personal_goal.saving_target,
+        "end_timeframe": user_personal_goal.end_timeframe
+    }
     
+    print(goal_object)
     
     plaid_data = request.get_json()
     if not plaid_data or 'access_token' not in plaid_data:
@@ -100,7 +100,7 @@ def ai_response():
             "response_format": {"type": "json_object"},
             "messages":  [
                 {"role": "system", "content": system_prompt}, 
-                {"role": "user", "content": f"{transactions_data}"},
+                {"role": "user", "content": f"{transactions_data}, {goal_object}"},
                 {"role": "assistant", "content": savings_example_json}
             ],
             "temperature":  0.2

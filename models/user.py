@@ -48,7 +48,6 @@ class User(db.Model, SerializerMixin):
             f"phone={self.phone}, " + \
             f"created_at={self.created_at}, " + \
             f"admin={self.admin}, " + \
-            f"role={self.role}, " + \
             f"visibility_status={self.visibility_status}, " + \
             f"rent={self.rent}, " + \
             f"income={self.income}, " + \

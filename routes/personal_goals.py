@@ -1,5 +1,6 @@
 from flask_restful import Resource
 from flask import request, session
+from datetime import datetime
 
 from models.models import Personal_goal
 from config import api, db
@@ -19,12 +20,15 @@ class Personal_goals(Resource):
         if not user_id:
             return {"message": "Unauthorized"}, 401
         new_personal_goal = Personal_goal(
-           name=request.get_json()["name"],
-           saving_target=request.get_json()["saving_target"],
-           end_timeframe=request.get_json()["end_timeframe"],
+            name=request.get_json()["name"],
+            saving_target=request.get_json()["saving_target"],
+            # end_timeframe=request.get_json()["end_timeframe"],
         )
         new_personal_goal.user_id = user_id
-
+        end_timeframe_str = request.get_json()["end_timeframe"]
+        end_timeframe = datetime.strptime(end_timeframe_str, "%Y-%m-%d %H:%M:%S")
+        new_personal_goal.end_timeframe = end_timeframe
+        
         db.session.add(new_personal_goal)
         db.session.commit()
 
