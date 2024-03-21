@@ -15,6 +15,7 @@ class Goal(db.Model, SerializerMixin):
     emoji = db.Column(db.String)
     
     group_id = db.Column(db.Integer, db.ForeignKey("groups.id"), nullable=False)
+    insights = db.relationship("Insight", cascade="all, delete", backref="goal")
     
     def __repr__(self):
         return f"Goal(id={self.id}, " + \
@@ -23,6 +24,7 @@ class Goal(db.Model, SerializerMixin):
             f"start_timeframe={self.start_timeframe}, " + \
             f"end_timeframe={self.end_timeframe}, " + \
             f"emoji={self.emoji}, " + \
+            f"insights={self.insights}, " + \
             f"group_id={self.group_id})" 
     
     
