@@ -76,6 +76,7 @@ def ai_response():
     user = User.query.filter(User.id == user_id).first()
     # There are multiple goals to a user, but we're picking the first one for demo purposes
     # will need to add logic to check which goal a user has chosen..
+    # id = request.get_json()["id"]
     user_personal_goal = user.personal_goals[0]
     goal_object = {
         "name": user_personal_goal.name,
@@ -160,6 +161,12 @@ def ai_response():
         
         db.session.add(new_db_insight)
         db.session.commit()
+        
+        for action in goals_json['actions']:
+            new_db_action = Action(text=action, insight_id=new_db_insight.id)
+            db.session.add(new_db_action)
+            db.session.commit()
+        
 
         # Return both responses
         return {
