@@ -14,139 +14,169 @@ if __name__ == "__main__":
         User.query.delete()
         Group.query.delete()
         Goal.query.delete()
-
-        #Creates fake groups
+        Insight.query.delete()
+        Personal_goal.query.delete()
+        Action.query.delete()
+        # Creates Family group and users
+        # roles = ["Admin", "Member", "Viewer"]
+        # visibility = ["Full", "Limited", "Restricted"]
         groups = []
-        print("    Seeding Groups...")
-        for i in range(5):
-            fake_name = fake.unique.last_name()
+        print("    Seeding Family Group...")
             
-            group = Group(
-                is_family = rc([True, False]),
-                name = fake_name,
-            )
+        family_group = Group(
+            is_family = True,
+            name = "The Craft Family",
+        )
 
-            db.session.add(group)
-            db.session.commit()
-            groups.append(group)
-        
-        # Creates fake users
+        db.session.add(family_group)
+        db.session.commit()
+        groups.append(family_group)
+        print("    Seeding Family Users...")
         users = []
-        print("    Seeding Users...")
-        roles = ["Admin", "Member"]
-        visibility = ["Full", "Limited", "Restricted"]
-        email_endpoints = ["@gmail.com", "@yahoo.com", "@outlook.com"]
-        for group in groups:
-            if group.is_family == False:
-                email_endpoint = rc(email_endpoints)
-                fake_first = fake.unique.first_name()
-                fake_last = fake.unique.last_name()
-                fake_number = fake.msisdn()
-                user = User(
-                    first_name = fake_first,
-                    last_name = fake_last,
-                    email = f"{fake_first}{fake_last}123{email_endpoint}",
-                    phone = fake_number,
-                    admin = True,
-                    role = roles[0],
-                    visibility_status = visibility[0],
-                    rent = randint(1000, 1500),
-                    income = randint(2500, 4000),
-                    group_id = group.id
-                )
-                user.password_hash = user.email
-                db.session.add(user)
-                db.session.commit()
+        dad = User(
+            first_name = "Steve",
+            last_name = "Craft",
+            email = f"SteveCraft123@gmail.com",
+            phone = fake.msisdn(),
+            admin = True,
+            role = "Admin",
+            visibility_status = "Full",
+            rent = randint(1000, 1500),
+            income = randint(2500, 4000),
+            group_id = family_group.id,
+            _access_token = "access-sandbox-371d3141-3c75-469b-978d-adc90f60abfc"
+        )
+        dad.password_hash = dad.email
 
-                users.append(user)
-            else:
-                email_endpoint = rc(email_endpoints)
-                fake_first = fake.unique.first_name()
-                fake_last = fake.unique.last_name()
-                fake_number = fake.msisdn()
+        db.session.add(dad)
+        db.session.commit()
+        users.append(dad)
 
-                user1 = User(
-                    first_name = fake_first,
-                    last_name = fake_last,
-                    email = f"{fake_first}{fake_last}123{email_endpoint}",
-                    phone = fake_number,
-                    admin = True,
-                    role = roles[0],
-                    visibility_status = visibility[0],
-                    rent = randint(1000, 1500),
-                    income = randint(2500, 4000),
-                    group_id = group.id
-                )
-                user1.password_hash = user1.email
-                db.session.add(user1)
-                db.session.commit()
+        mom = User(
+            first_name = "Alex",
+            last_name = "Craft",
+            email = f"AlexCraft123@gmail.com",
+            phone = fake.msisdn(),
+            admin = True,
+            role = "Member",
+            visibility_status = "Full",
+            rent = randint(1000, 1500),
+            income = randint(2500, 4000),
+            group_id = family_group.id, 
+            _access_token = "access-sandbox-12a993e3-e0ce-4e17-b14c-3340096978a5"
+        )
+        mom.password_hash = mom.email
 
-                users.append(user1)
+        db.session.add(mom)
+        db.session.commit()
+        users.append(mom)
 
-                random_range = randint(1, 3)
-                for i in range(random_range):
-                    email_endpoint = rc(email_endpoints)
-                    fake_first = fake.unique.first_name()
-                    fake_last = fake.unique.last_name()
-                    fake_number = fake.msisdn()
+        family_group.total_income = mom.income + dad.income
+        family_group._access_token = f"{dad._access_token}%%{mom._access_token}"
 
-                    user2 = User(
-                        first_name = fake_first,
-                        last_name = fake_last,
-                        email = f"{fake_first}{fake_last}123{email_endpoint}",
-                        phone = fake_number,
-                        admin = False,
-                        role = roles[1],
-                        visibility_status = visibility[1],
-                        rent = 0,
-                        income = 0,
-                        group_id = group.id
-                    )
-                    user2.password_hash = user2.email
-                    db.session.add(user2)
-                    db.session.commit()
+        child = User(
+            first_name = "Steelix",
+            last_name = "Craft",
+            email = f"SteelixCraft123@gmail.com",
+            phone = fake.msisdn(),
+            admin = True,
+            role = "Viewer",
+            visibility_status = "Restricted",
+            rent = randint(1000, 1500),
+            income = randint(2500, 4000),
+            group_id = family_group.id  
+        )
+        child.password_hash = child.email
 
-                    users.append(user2)
+        db.session.add(child)
+        db.session.commit()
+        users.append(child)
 
-        #Creates fake goals
+        print("    Seeding Family Group Goals...")
         goals = []
-        print("    Seeding Goals...")
         emojis = ["U+1F600", "U+1F607", "U+1F911", "U+1F62C", "U+1F634"]
-        for group in groups:
-            image = rc(emojis)
-
+        goal_names = ["Save up for a cruise", "Save up for a vacation", "Have an emergency cushion", "Save for a large purchase", "Build a nest egg", "Create a unique goal"]
+        for i in range(randint(2, 4)):
             goal = Goal(
-                name = fake.unique.first_name(),
+                name = rc(goal_names),
                 saving_target = randint(100, 500),
                 start_timeframe = fake.past_date(),
                 end_timeframe= fake.future_date(),
-                emoji =  image,
-                group_id = group.id
+                emoji = rc(emojis),
+                group_id = family_group.id
             )
 
             db.session.add(goal)
             db.session.commit()
             goals.append(goal)
+        
+        print("    Seeding Single User...")
+        single_user = User(
+            first_name = "Single",
+            last_name = "User",
+            email = f"SingleUser123@gmail.com",
+            phone = fake.msisdn(),
+            admin = True,
+            role = "Admin",
+            visibility_status = "Full",
+            rent = randint(1000, 1500),
+            income = randint(2500, 4000),
+        )
+        single_user.password_hash = single_user.email
 
-        #Creates fake accounts
-        # accounts = []
-        # print("    Seeding Accounts...")
-        # acc_types = ["Savings", "Checking"]
-        # for user in users:
-        #     types = rc(acc_types)
-        #     acc_bal = 0
-        #     if user.admin == True:
-        #         acc_bal = randint(400, 1500)
+        db.session.add(single_user)
+        db.session.commit()
+        users.append(single_user)
 
-        #     account = Account(
-        #         name = fake.unique.company(),
-        #         type = types,
-        #         balance = acc_bal,
-        #         user_id = user.id,
-        #     )
+        print("    Seeding personal goals...")
+        personal_goals = []
+        for user in users:
+            for i in range(randint(1, 3)):
+                pg = Personal_goal(
+                    name = rc(goal_names),
+                    saving_target = randint(100, 500),
+                    start_timeframe = fake.past_date(),
+                    end_timeframe= fake.future_date(),
+                    emoji = rc(emojis),
+                    user_id = user.id
+                )
+                db.session.add(pg)
+                db.session.commit()
+                personal_goals.append(pg)
 
-        #     db.session.add(account)
-        #     db.session.commit()
-        #     groups.append(group)
+        print("    Seeding insights...")
+        insights = []
+        actions = []
+        for goal in goals:
+            insight = Insight(
+                    savings_monthly = randint(100, 500),
+                    savings_needed = randint(100, 500),
+                    strategy = fake.paragraph(nb_sentences=5),
+                    goal_id = goal.id
+            )
+            db.session.add(insight)
+            db.session.commit()
+            insights.append(insight)
 
-        print("Seed complete!")
+        for personal_goal in personal_goals:
+            insight = Insight(
+                savings_monthly = randint(100, 500),
+                savings_needed = randint(100, 500),
+                strategy = fake.paragraph(nb_sentences=5),
+                personal_goal_id = personal_goal.id
+            )
+            db.session.add(insight)
+            db.session.commit()
+            insights.append(insight)
+        
+        for insight in insights:
+            for i in range(5):
+                action = Action(
+                    text = fake.sentence(),
+                    insight_id = insight.id
+                )
+                db.session.add(action)
+                db.session.commit()
+                actions.append(action)
+
+    print("Seed complete!")

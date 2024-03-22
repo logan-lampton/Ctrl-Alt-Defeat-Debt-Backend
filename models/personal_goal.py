@@ -1,10 +1,10 @@
 from config import db
 from sqlalchemy_serializer import SerializerMixin
 
-class Goal(db.Model, SerializerMixin):
-    __tablename__ = 'goals'
+class Personal_goal(db.Model, SerializerMixin):
+    __tablename__ = 'personal_goals'
 
-    serialize_rules = ('-group', '-user', '-insights.goal', '-insights.goal_id')
+    serialize_rules = ('-insights.personal_goal', '-user')
     
     id = db.Column(db.Integer, primary_key=True)
     
@@ -15,11 +15,11 @@ class Goal(db.Model, SerializerMixin):
     emoji = db.Column(db.String)
     amount_saved = db.Column(db.Float, default=0.0)
     
-    group_id = db.Column(db.Integer, db.ForeignKey("groups.id"), nullable=False)
-    insights = db.relationship("Insight", cascade="all, delete", backref="goal")
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    insights = db.relationship("Insight", cascade="all, delete", backref="personal_goal")
     
     def __repr__(self):
-        return f"Goal(id={self.id}, " + \
+        return f"Personal_goal(id={self.id}, " + \
             f"name={self.name}, " + \
             f"saving_target={self.saving_target}, " + \
             f"start_timeframe={self.start_timeframe}, " + \
@@ -27,6 +27,4 @@ class Goal(db.Model, SerializerMixin):
             f"emoji={self.emoji}, " + \
             f"insights={self.insights}, " + \
             f"amount_saved={self.amount_saved}, " + \
-            f"group_id={self.group_id})" 
-    
-    
+            f"user_id={self.user_id})" 
