@@ -5,14 +5,14 @@ from sqlalchemy.ext.hybrid import hybrid_property
 class User(db.Model, SerializerMixin):
     __tablename__ = "users"
 
-    serialize_rules = ('-group', '-goal')
+    serialize_rules = ('-group', '-goal', '-personal_goals.insights', '-personal_goals.user', '-personal_goals.user_id', '-insights')
 
     id = db.Column(db.Integer, primary_key=True)
 
-    first_name = db.Column(db.String, unique=True, nullable=False)
-    last_name = db.Column(db.String, unique=True, nullable=False)
+    first_name = db.Column(db.String, nullable=False)
+    last_name = db.Column(db.String, nullable=False)
     email = db.Column(db.String, unique=True, nullable=False)
-    phone = db.Column(db.String, unique=True, nullable=False)
+    phone = db.Column(db.String, unique=True)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     admin = db.Column(db.Boolean, default=True, nullable=False)
     role = db.Column(db.String, nullable=False)
@@ -25,6 +25,7 @@ class User(db.Model, SerializerMixin):
     _totp_secret = db.Column(db.String)
 
     group_id = db.Column(db.Integer, db.ForeignKey("groups.id"))
+    personal_goals = db.relationship("Personal_goal", cascade="all, delete", backref="user")
 
     @hybrid_property
     def password_hash(self):

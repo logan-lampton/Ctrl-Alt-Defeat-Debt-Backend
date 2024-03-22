@@ -4,12 +4,14 @@ from sqlalchemy_serializer import SerializerMixin
 class Group(db.Model, SerializerMixin):
     __tablename__ = "groups"
 
-    serialize_rules = ('-users.group', '-goals.group')
+    serialize_rules = ('-users.group', '-users.group_id', '-users.personal_goals', '-goals.group', '-goals.group_id', '-goals.insights')
 
     id = db.Column(db.Integer, primary_key=True)
 
     is_family = db.Column(db.Boolean, nullable=False)
-    name = db.Column(db.String, nullable=False)
+    name = db.Column(db.String)
+    total_income = db.Column(db.String)
+    total_expenses = db.Column(db.String)
     _access_token = db.Column(db.String)
 
     users = db.relationship("User", cascade="all, delete", backref="group")
