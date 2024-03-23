@@ -48,8 +48,6 @@ class Signup(Resource):
             last_name=request.get_json()["last_name"],
             email=request.get_json()["email"],
             phone=request.get_json()["phone"],
-            rent=request.get_json()["rent"],
-            income=request.get_json()["income"],
         )
         
         try:
@@ -59,6 +57,14 @@ class Signup(Resource):
         try: 
             user.visibility_status = request.get_json()["visibility_status"]
         except:
+            pass
+        try:
+            user.rent = request.get_json()["rent"]
+        except: 
+            pass
+        try:
+            user.income = request.get_json()["income"]
+        except: 
             pass
         
         

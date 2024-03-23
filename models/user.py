@@ -16,8 +16,8 @@ class User(db.Model, SerializerMixin):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     admin = db.Column(db.Boolean, default=True, nullable=False)
     visibility_status = db.Column(db.String, default="Full",nullable=False)
-    rent = db.Column(db.Float, nullable=False)
-    income = db.Column(db.Float, default=0, nullable=False)
+    rent = db.Column(db.Float(2), default=0, nullable=False)
+    income = db.Column(db.Float(2), default=0, nullable=False)
 
     _password_hash = db.Column(db.String, nullable=False)
     _access_token = db.Column(db.String)
