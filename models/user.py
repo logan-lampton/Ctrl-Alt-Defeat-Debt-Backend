@@ -15,8 +15,7 @@ class User(db.Model, SerializerMixin):
     phone = db.Column(db.String, unique=True)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     admin = db.Column(db.Boolean, default=True, nullable=False)
-    role = db.Column(db.String, nullable=False)
-    visibility_status = db.Column(db.String, nullable=False)
+    visibility_status = db.Column(db.String, default="Full",nullable=False)
     rent = db.Column(db.Float, nullable=False)
     income = db.Column(db.Float, default=0, nullable=False)
 
@@ -43,14 +42,16 @@ class User(db.Model, SerializerMixin):
     
     def __repr__(self):
         return f"User(id={self.id}, " + \
-            f"email={self.email}, " + \
             f"first_name={self.first_name}, " + \
             f"last_name={self.last_name}, " + \
+            f"email={self.email}, " + \
             f"phone={self.phone}, " + \
             f"created_at={self.created_at}, " + \
             f"admin={self.admin}, " + \
             f"role={self.role}, " + \
             f"visibility_status={self.visibility_status}, " + \
             f"rent={self.rent}, " + \
-            f"group_id={self.group_id}, " + \
-            f"income={self.income})"
+            f"income={self.income}, " + \
+            f"_access_token={self._access_token}, " + \
+            f"_totp_secret={self._totp_secret}, " + \
+            f"group_id={self.group_id})"

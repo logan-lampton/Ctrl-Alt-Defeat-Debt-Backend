@@ -8,9 +8,9 @@ class Insight(db.Model, SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    savings_monthly = db.Column(db.Float(2))
-    savings_needed = db.Column(db.Float(2))
-    strategy = db.Column(db.String)
+    savings_monthly = db.Column(db.Float(2), nullable=False)
+    savings_needed = db.Column(db.Float(2), nullable=False)
+    strategy = db.Column(db.String, nullable=False)
 
     goal_id = db.Column(db.Integer, db.ForeignKey("goals.id"))
     personal_goal_id = db.Column(db.Integer, db.ForeignKey("personal_goals.id"))
@@ -21,5 +21,6 @@ class Insight(db.Model, SerializerMixin):
             f"savings_monthly={self.savings_monthly}, " + \
             f"savings_needed={self.savings_needed}, " + \
             f"strategy={self.strategy}, " + \
-            f"actions={self.actions}, " + \
-            f"group_id={self.goal_id}) "
+            f"goal_id={self.goal_id}, " + \
+            f"personal_goal_id={self.personal_goal_id}, " + \
+            f"actions={self.actions}) "
