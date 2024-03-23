@@ -24,7 +24,6 @@ if __name__ == "__main__":
         print("    Seeding Family Group...")
             
         family_group = Group(
-            is_family = True,
             name = "The Craft Family",
         )
 
@@ -39,7 +38,6 @@ if __name__ == "__main__":
             email = f"SteveCraft123@gmail.com",
             phone = fake.msisdn(),
             admin = True,
-            role = "Admin",
             visibility_status = "Full",
             rent = randint(1000, 1500),
             income = randint(2500, 4000),
@@ -58,7 +56,6 @@ if __name__ == "__main__":
             email = f"AlexCraft123@gmail.com",
             phone = fake.msisdn(),
             admin = True,
-            role = "Member",
             visibility_status = "Full",
             rent = randint(1000, 1500),
             income = randint(2500, 4000),
@@ -80,7 +77,6 @@ if __name__ == "__main__":
             email = f"SteelixCraft123@gmail.com",
             phone = fake.msisdn(),
             admin = True,
-            role = "Viewer",
             visibility_status = "Restricted",
             rent = randint(1000, 1500),
             income = randint(2500, 4000),
@@ -117,7 +113,6 @@ if __name__ == "__main__":
             email = f"SingleUser123@gmail.com",
             phone = fake.msisdn(),
             admin = True,
-            role = "Admin",
             visibility_status = "Full",
             rent = randint(1000, 1500),
             income = randint(2500, 4000),

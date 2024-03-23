@@ -51,12 +51,17 @@ class Signup(Resource):
             rent=request.get_json()["rent"],
             income=request.get_json()["income"],
         )
-
-        if request.get_json()["admin"]:
+        
+        try:
             user.admin = request.get_json()["admin"]
-        if request.get_json()["visibility_status"]:
+        except: 
+            pass
+        try: 
             user.visibility_status = request.get_json()["visibility_status"]
-
+        except:
+            pass
+        
+        
         user.password_hash = request.get_json()["password"]
         try:
             db.session.add(user)
