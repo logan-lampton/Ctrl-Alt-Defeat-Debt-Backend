@@ -9,11 +9,11 @@ class Goal(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     
     name = db.Column(db.String, nullable=False)
-    saving_target = db.Column(db.Float, default=0.0, nullable=False)
+    saving_target = db.Column(db.Float, default=0, nullable=False)
     start_timeframe = db.Column(db.DateTime, server_default=db.func.now())
-    end_timeframe = db.Column(db.DateTime)
+    end_timeframe = db.Column(db.DateTime, nullable=False)
     emoji = db.Column(db.String)
-    amount_saved = db.Column(db.Float, default=0.0)
+    amount_saved = db.Column(db.Float, default=0)
     
     group_id = db.Column(db.Integer, db.ForeignKey("groups.id"), nullable=False)
     insights = db.relationship("Insight", cascade="all, delete", backref="goal")
@@ -25,8 +25,8 @@ class Goal(db.Model, SerializerMixin):
             f"start_timeframe={self.start_timeframe}, " + \
             f"end_timeframe={self.end_timeframe}, " + \
             f"emoji={self.emoji}, " + \
-            f"insights={self.insights}, " + \
             f"amount_saved={self.amount_saved}, " + \
-            f"group_id={self.group_id})" 
+            f"group_id={self.group_id}, " + \
+            f"insights={self.insights})" 
     
     

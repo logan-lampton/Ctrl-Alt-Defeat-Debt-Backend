@@ -8,8 +8,7 @@ class Group(db.Model, SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    is_family = db.Column(db.Boolean, nullable=False)
-    name = db.Column(db.String)
+    name = db.Column(db.String, nullable=False)
     total_income = db.Column(db.String)
     total_expenses = db.Column(db.String)
     _access_token = db.Column(db.String)
@@ -19,8 +18,9 @@ class Group(db.Model, SerializerMixin):
     
     def __repr__(self):
         return f"Group(id={self.id}, " + \
-            f"is_family={self.is_family}, " + \
             f"name={self.name}, " + \
-            f"name={self._access_token}, " + \
+            f"total_income={self.total_income}, " + \
+            f"total_expenses={self.total_expenses}, " + \
+            f"_access_token={self._access_token}, " + \
             f"users={self.users}, " + \
             f"goals={self.goals})"

@@ -8,7 +8,7 @@ class Action(db.Model, SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    text = db.Column(db.String)
+    text = db.Column(db.String, nullable=False)
     
     insight_id = db.Column(db.Integer, db.ForeignKey("insights.id"))
     
