@@ -15,8 +15,7 @@ class User(db.Model, SerializerMixin):
     phone = db.Column(db.String, unique=True)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     admin = db.Column(db.Boolean, default=True, nullable=False)
-    role = db.Column(db.String, nullable=False)
-    visibility_status = db.Column(db.String, nullable=False)
+    visibility_status = db.Column(db.String, default="Full",nullable=False)
     rent = db.Column(db.Float, nullable=False)
     income = db.Column(db.Float, default=0, nullable=False)
 

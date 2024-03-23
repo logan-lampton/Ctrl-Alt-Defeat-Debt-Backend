@@ -43,25 +43,20 @@ class Login(Resource):
 class Signup(Resource):
     
     def post(self):
-        group = Group(
-            is_family=request.get_json()["first_name"],
-            name=request.get_json()["first_name"],
-        )
-        db.session.add(group)
-        db.session.commit()
-
         user = User(
             first_name=request.get_json()["first_name"],
             last_name=request.get_json()["last_name"],
             email=request.get_json()["email"],
             phone=request.get_json()["phone"],
-            admin=request.get_json()["admin"],
-            role=request.get_json()["role"],
-            visibility_status=request.get_json()["visibility_status"],
             rent=request.get_json()["rent"],
             income=request.get_json()["income"],
-            group_id=request.get_json()["group_id"],
         )
+
+        if request.get_json()["admin"]:
+            user.admin = request.get_json()["admin"]
+        if request.get_json()["visibility_status"]:
+            user.visibility_status = request.get_json()["visibility_status"]
+
         user.password_hash = request.get_json()["password"]
         try:
             db.session.add(user)
