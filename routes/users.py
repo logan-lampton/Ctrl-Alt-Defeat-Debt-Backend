@@ -25,6 +25,19 @@ class Users(Resource):
             list.append(user_obj)
 
         return list, 200
+
+    def patch(self, user_id):
+        user = User.query.filter_by(id=user_id).first()
+        if not user:
+            return {"error": "User not found"}, 404
+        
+        new_access_token = request.get_json().get('_access_token')
+        if not new_access_token:
+            return {"error": "New access token not provided"}, 400
+        
+        user._access_token = new_access_token
+        db.session.commit()
+        return {"message": "Access token updated successfully"}, 200
   
 class Login(Resource):
 
@@ -85,7 +98,7 @@ class Logout(Resource):
         session['user_id'] = None
         return {}, 204
 
-api.add_resource(Users, "/users")
+api.add_resource(Users, "/users", "/users/<int:user_id>")
 api.add_resource(CheckSession, "/check_session")
 api.add_resource(Login, "/login")
 api.add_resource(Signup, "/signup")
