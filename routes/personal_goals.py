@@ -20,13 +20,18 @@ class Personal_goals(Resource):
         if not user_id:
             return {"message": "Unauthorized"}, 401
         new_personal_goal = Personal_goal(
+            user_id =request.get_json()["user_id"],
             name=request.get_json()["name"],
             saving_target=request.get_json()["saving_target"],
-            # end_timeframe=request.get_json()["end_timeframe"],
+            emoji=request.get_json()["emoji"],
         )
-        new_personal_goal.user_id = user_id
+        #logic for converting string datetime in python object
         end_timeframe_str = request.get_json()["end_timeframe"]
-        end_timeframe = datetime.strptime(end_timeframe_str, "%Y-%m-%d %H:%M:%S")
+        year = int(end_timeframe_str[0:4])
+        month = int(end_timeframe_str[5:7])
+        day = int(end_timeframe_str[8:10])
+        end_timeframe = datetime(year, month, day)
+
         new_personal_goal.end_timeframe = end_timeframe
         
         db.session.add(new_personal_goal)
