@@ -4,7 +4,7 @@ from models.models import *
 from routes.routes import *
 from integration.plaid_integration import plaid_bp 
 from routes.two_fa_routes import two_fa_blueprint
-from ai_api import open_ai
+from integration.ai_api import open_ai
 
 
 app.register_blueprint(plaid_bp, url_prefix='/plaid')
