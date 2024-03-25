@@ -90,15 +90,21 @@ if __name__ == "__main__":
 
         print("    Seeding Family Group Goals...")
         goals = []
-        emojis = ["U+1F600", "U+1F607", "U+1F911", "U+1F62C", "U+1F634"]
-        goal_names = ["Save up for a cruise", "Save up for a vacation", "Have an emergency cushion", "Save for a large purchase", "Build a nest egg", "Create a unique goal"]
-        for i in range(randint(2, 4)):
+        goal_objects = [
+            {"emoji": "🛳️", "name": "Save up for a cruise"},
+            {"emoji": "✈️", "name": "Save up for a vacation"},
+            {"emoji": "💰", "name": "Have an emergency cushion"},
+            {"emoji": "🎉", "name": "Save for a large purchase"},
+            {"emoji": "👨🏽‍🦳", "name": "Build a nest egg"}
+        ]
+        for i in range(2):
+            random_goal = rc(goal_objects)
             goal = Goal(
-                name = rc(goal_names),
+                name = random_goal["name"],
                 saving_target = randint(100, 500),
                 start_timeframe = fake.past_date(),
                 end_timeframe= fake.future_date(),
-                emoji = rc(emojis),
+                emoji = random_goal["emoji"],
                 group_id = family_group.id
             )
 
@@ -126,13 +132,14 @@ if __name__ == "__main__":
         print("    Seeding personal goals...")
         personal_goals = []
         for user in users:
-            for i in range(randint(1, 3)):
+            for i in range(2):
+                random_goal = rc(goal_objects)
                 pg = Personal_goal(
-                    name = rc(goal_names),
+                    name = random_goal["name"],
                     saving_target = randint(100, 500),
                     start_timeframe = fake.past_date(),
                     end_timeframe= fake.future_date(),
-                    emoji = rc(emojis),
+                    emoji = random_goal["emoji"],
                     user_id = user.id
                 )
                 db.session.add(pg)

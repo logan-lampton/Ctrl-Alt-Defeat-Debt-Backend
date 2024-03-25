@@ -1,5 +1,6 @@
 from flask_restful import Resource
 from flask import request, session
+from datetime import datetime
 
 from models.models import Goal
 from config import api, db
@@ -21,9 +22,18 @@ class Goals(Resource):
         new_goal = Goal(
            name=request.get_json()["name"],
            saving_target=request.get_json()["saving_target"],
-           end_timeframe=request.get_json()["end_timeframe"],
+           group_id=request.get_json()["group_id"],
+           emoji=request.get_json()["emoji"],
         )
-        new_goal.group_id = request.get_json()["goal_id"]
+
+        #logic for converting string datetime in python object
+        end_timeframe_str = request.get_json()["end_timeframe"]
+        year = int(end_timeframe_str[0:4])
+        month = int(end_timeframe_str[5:7])
+        day = int(end_timeframe_str[8:10])
+        end_timeframe = datetime(year, month, day)
+
+        new_goal.end_timeframe = end_timeframe
 
         db.session.add(new_goal)
         db.session.commit()
