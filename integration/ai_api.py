@@ -98,7 +98,7 @@ def ai_response():
 
         # Construct the goals request payload
         goals_payload = {
-            "model": "gpt-3.5-turbo-0125",
+            "model": "gpt-3.5-turbo",
             "response_format": {"type": "json_object"},
             "messages":  [
                 {"role": "system", "content": system_prompt}, 
@@ -110,7 +110,7 @@ def ai_response():
         
         # Construct the predictions request payload
         predictions_payload = {
-            "model": "gpt-3.5-turbo-0125",
+            "model": "gpt-3.5-turbo",
             "response_format": {"type": "json_object"},
             "messages":  [
                 {"role": "system", "content": insights_system_prompt}, 
